@@ -1,0 +1,1187 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Gallery | Museum of Lost Things</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        /* ===== Archive Drawer Gallery Override ===== */
+        .gallery-page-hero {
+            background: linear-gradient(to bottom, rgba(250, 252, 252, 0.82), rgba(243, 248, 249, 0.9));
+        }
+
+        .gallery-page-intro {
+            max-width: 720px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .gallery-page-description {
+            max-width: 40rem;
+            margin: 0 auto;
+            font-size: 1.04rem;
+            color: #4e6d79;
+            line-height: 1.65;
+        }
+
+        .gallery-filter-section {
+            padding-top: 0;
+            background: transparent;
+        }
+
+        .gallery-filter-section .section-inner {
+            padding-top: 0;
+            padding-bottom: 1.25rem;
+        }
+
+        .gallery-filter-bar {
+            display: flex;
+            gap: 0.55rem;
+            overflow-x: auto;
+            padding-bottom: 0.35rem;
+            scrollbar-width: none;
+        }
+
+        .gallery-filter-bar::-webkit-scrollbar {
+            display: none;
+        }
+
+        .filter-chip {
+            flex: 0 0 auto;
+            border: 1px solid rgba(109, 164, 181, 0.22);
+            background: rgba(255, 255, 255, 0.9);
+            color: #3f6777;
+            border-radius: 999px;
+            padding: 0.7rem 1rem;
+            font: inherit;
+            font-size: 0.95rem;
+            line-height: 1;
+            cursor: pointer;
+            transition: transform 0.2s ease, background 0.2s ease, border-color 0.2s ease;
+            box-shadow: 0 6px 14px rgba(62, 101, 116, 0.06);
+        }
+
+        .filter-chip:hover,
+        .filter-chip:focus {
+            transform: translateY(-1px);
+            border-color: rgba(98, 170, 190, 0.4);
+        }
+
+        .filter-chip.active,
+        .filter-chip[aria-pressed="true"] {
+            background: linear-gradient(135deg, #7fcfe0, #5aaec4);
+            color: #ffffff;
+            border-color: transparent;
+            box-shadow: 0 10px 20px rgba(90, 174, 196, 0.24);
+        }
+
+        .gallery-collection-section {
+            background: transparent;
+        }
+
+        .gallery-collection-section .section-inner {
+            padding-top: 0.5rem;
+        }
+
+        .gallery-collection-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1.2rem;
+            align-items: stretch;
+        }
+
+        .archive-card {
+            position: relative;
+            min-height: 340px;
+        }
+
+        .archive-card[hidden] {
+            display: none !important;
+        }
+
+        .archive-card-button {
+            position: relative;
+            width: 100%;
+            min-height: 340px;
+            text-align: left;
+            border: 1px solid rgba(116, 170, 186, 0.2);
+            border-radius: 24px;
+            padding: 1rem 1rem 1.1rem;
+            background:
+                linear-gradient(180deg, rgba(248, 243, 235, 0.97), rgba(252, 249, 244, 0.98));
+            box-shadow: 0 14px 30px rgba(63, 102, 118, 0.09);
+            cursor: pointer;
+            overflow: hidden;
+            transition: transform 0.24s ease, box-shadow 0.24s ease, border-color 0.24s ease;
+            color: #2f4858;
+        }
+
+        .archive-card-button:hover,
+        .archive-card-button:focus-visible {
+            transform: translateY(-4px);
+            box-shadow: 0 18px 38px rgba(63, 102, 118, 0.13);
+            border-color: rgba(98, 170, 190, 0.36);
+            outline: none;
+        }
+
+        .archive-card-button::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background:
+                linear-gradient(180deg, rgba(255, 255, 255, 0.33), transparent 22%),
+                repeating-linear-gradient(0deg,
+                    transparent 0 31px,
+                    rgba(52, 96, 112, 0.04) 31px 32px);
+            pointer-events: none;
+        }
+
+        .archive-card-button::after {
+            content: "";
+            position: absolute;
+            width: 116px;
+            height: 116px;
+            right: -28px;
+            top: -28px;
+            border-radius: 50%;
+            background:
+                radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.55) 0 42%, transparent 43%),
+                radial-gradient(circle at 50% 50%, rgba(138, 197, 214, 0.12) 0 68%, transparent 69%);
+            pointer-events: none;
+        }
+
+        .archive-stamp {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.55rem;
+            position: relative;
+            z-index: 1;
+            padding: 0.42rem 0.72rem;
+            border-radius: 999px;
+            border: 1px solid rgba(90, 147, 165, 0.16);
+            background: rgba(255, 255, 255, 0.58);
+            color: #6d8a97;
+            font-size: 0.76rem;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+        }
+
+        .archive-stamp .status-mark {
+            display: inline-block;
+            padding: 0.18rem 0.42rem;
+            border-radius: 999px;
+            background: rgba(132, 193, 209, 0.18);
+            color: #4f7382;
+            font-size: 0.68rem;
+            letter-spacing: 0.08em;
+        }
+
+        .archive-title {
+            position: relative;
+            z-index: 1;
+            margin: 1rem 0 0.8rem;
+            padding-right: 6rem;
+            font-size: 1.5rem;
+            line-height: 1.1;
+            color: #21495b;
+        }
+
+        .archive-meta {
+            position: relative;
+            z-index: 1;
+            display: grid;
+            gap: 0.42rem;
+            margin: 0 0 1rem;
+            padding: 0.9rem 0 0;
+            border-top: 1px dashed rgba(93, 143, 160, 0.25);
+            max-width: calc(100% - 6.25rem);
+        }
+
+        .archive-meta p,
+        .archive-condition,
+        .archive-prompt {
+            margin: 0;
+        }
+
+        .archive-meta p,
+        .archive-condition {
+            font-size: 0.92rem;
+            line-height: 1.48;
+            color: #567280;
+        }
+
+        .archive-meta strong,
+        .archive-condition strong {
+            color: #2f5364;
+            font-weight: 700;
+        }
+
+        .archive-condition {
+            position: relative;
+            z-index: 1;
+            max-width: calc(100% - 6.25rem);
+        }
+
+        .archive-prompt {
+            position: absolute;
+            left: 1rem;
+            bottom: 0.95rem;
+            z-index: 1;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.45rem;
+            font-size: 0.86rem;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: #5b7b89;
+        }
+
+        .archive-prompt::after {
+            content: "→";
+            font-size: 1rem;
+            transition: transform 0.22s ease;
+        }
+
+        .archive-card-button:hover .archive-prompt::after,
+        .archive-card-button:focus-visible .archive-prompt::after {
+            transform: translateX(3px);
+        }
+
+        .archive-image-wrap {
+            position: absolute;
+            right: 0.9rem;
+            bottom: 1rem;
+            width: 5.15rem;
+            aspect-ratio: 4 / 5;
+            z-index: 1;
+            border-radius: 14px;
+            overflow: hidden;
+            box-shadow: 0 10px 18px rgba(57, 96, 111, 0.14);
+            border: 4px solid rgba(255, 255, 255, 0.9);
+            transform: rotate(5deg);
+            background: linear-gradient(to bottom, rgba(238, 245, 247, 0.9), rgba(245, 240, 231, 0.85));
+        }
+
+        .archive-image-wrap img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 0;
+        }
+
+        .archive-card.words .archive-image-wrap {
+            transform: rotate(-4deg);
+        }
+
+        .archive-card.places .archive-image-wrap {
+            transform: rotate(3deg);
+        }
+
+        .archive-card.memories .archive-image-wrap {
+            transform: rotate(-2deg);
+        }
+
+        .archive-empty {
+            display: none;
+            text-align: center;
+            margin: 0;
+            padding: 1.25rem 1rem 0;
+            font-size: 1rem;
+            color: #6b8793;
+        }
+
+        .archive-empty.show {
+            display: block;
+        }
+
+        .gallery-back-section {
+            background: transparent;
+        }
+
+        .gallery-back-section .section-inner {
+            padding-top: 1rem;
+            text-align: center;
+        }
+
+        .gallery-back-link {
+            display: flex;
+            justify-content: center;
+        }
+
+        /* ===== Modal ===== */
+        .archive-modal[hidden] {
+            display: none;
+        }
+
+        .archive-modal {
+            position: fixed;
+            inset: 0;
+            z-index: 300;
+        }
+
+        .archive-modal-backdrop {
+            position: absolute;
+            inset: 0;
+            background: rgba(28, 54, 67, 0.46);
+            backdrop-filter: blur(5px);
+        }
+
+        .archive-modal-dialog {
+            position: relative;
+            z-index: 1;
+            width: min(1080px, calc(100% - 24px));
+            max-height: calc(100vh - 32px);
+            overflow: auto;
+            margin: 16px auto;
+            border-radius: 28px;
+            border: 1px solid rgba(116, 170, 186, 0.16);
+            background:
+                linear-gradient(180deg, rgba(248, 243, 235, 0.98), rgba(252, 249, 244, 0.99));
+            box-shadow: 0 24px 50px rgba(24, 49, 61, 0.22);
+            padding: 1.1rem;
+        }
+
+        .archive-modal-dialog::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background:
+                linear-gradient(180deg, rgba(255, 255, 255, 0.30), transparent 20%),
+                repeating-linear-gradient(0deg, transparent 0 36px, rgba(52, 96, 112, 0.035) 36px 37px);
+            pointer-events: none;
+            border-radius: 28px;
+        }
+
+        .archive-modal-close {
+            position: sticky;
+            top: 0.1rem;
+            margin-left: auto;
+            z-index: 2;
+            display: grid;
+            place-items: center;
+            width: 2.5rem;
+            height: 2.5rem;
+            border: none;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.86);
+            color: #456776;
+            font-size: 1.6rem;
+            cursor: pointer;
+            box-shadow: 0 8px 16px rgba(63, 102, 118, 0.08);
+        }
+
+        .archive-modal-content {
+            position: relative;
+            z-index: 1;
+            display: grid;
+            gap: 1.2rem;
+        }
+
+        .archive-modal-visual {
+            display: grid;
+            gap: 0.8rem;
+        }
+
+        .archive-modal-figure {
+            border-radius: 22px;
+            overflow: hidden;
+            border: 1px solid rgba(116, 170, 186, 0.14);
+            box-shadow: 0 14px 28px rgba(63, 102, 118, 0.08);
+            background: rgba(255, 255, 255, 0.5);
+        }
+
+        .archive-modal-figure img {
+            width: 100%;
+            max-height: 440px;
+            object-fit: cover;
+            border-radius: 0;
+        }
+
+        .archive-modal-caption {
+            margin: 0;
+            font-size: 0.92rem;
+            color: #6f8995;
+            line-height: 1.6;
+        }
+
+        .archive-modal-copy {
+            padding: 0.1rem 0.1rem 0.3rem;
+        }
+
+        .archive-modal-label {
+            margin: 0 0 0.6rem;
+            font-size: 0.82rem;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            color: #728d99;
+        }
+
+        .archive-modal-title {
+            margin: 0 0 0.9rem;
+            font-size: clamp(2rem, 4vw, 3rem);
+            line-height: 1.02;
+            color: #20495d;
+        }
+
+        .archive-modal-record {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.6rem;
+            margin: 0 0 1rem;
+            padding: 0.44rem 0.78rem;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.65);
+            border: 1px solid rgba(90, 147, 165, 0.14);
+            color: #5d7c89;
+            font-size: 0.76rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+        }
+
+        .archive-modal-grid {
+            display: grid;
+            gap: 0.7rem;
+            margin: 0 0 1.2rem;
+            padding: 1rem;
+            border-radius: 18px;
+            background: rgba(255, 255, 255, 0.48);
+            border: 1px solid rgba(116, 170, 186, 0.12);
+        }
+
+        .archive-modal-grid p,
+        .archive-modal-note,
+        .archive-modal-footer-note {
+            margin: 0;
+        }
+
+        .archive-modal-grid p {
+            font-size: 0.96rem;
+            line-height: 1.55;
+            color: #546f7d;
+        }
+
+        .archive-modal-grid strong {
+            color: #284b5d;
+        }
+
+        .archive-modal-subhead {
+            margin: 0 0 0.55rem;
+            font-size: 0.86rem;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: #708894;
+        }
+
+        .archive-modal-note {
+            font-size: 1rem;
+            line-height: 1.8;
+            color: #456674;
+        }
+
+        .archive-modal-footer-note {
+            margin-top: 1rem;
+            font-size: 0.92rem;
+            color: #7a949f;
+        }
+
+        @media (min-width: 768px) {
+            .gallery-filter-bar {
+                justify-content: center;
+                flex-wrap: wrap;
+                overflow-x: visible;
+            }
+
+            .gallery-collection-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                gap: 1.35rem;
+            }
+
+            .archive-card-button {
+                min-height: 360px;
+                padding: 1.15rem 1.15rem 1.2rem;
+            }
+
+            .archive-title {
+                font-size: 1.66rem;
+            }
+
+            .archive-image-wrap {
+                width: 5.8rem;
+            }
+
+            .archive-modal-dialog {
+                padding: 1.4rem;
+            }
+
+            .archive-modal-content {
+                grid-template-columns: 1fr 1fr;
+                gap: 1.5rem;
+                align-items: start;
+            }
+
+            .archive-modal-copy {
+                padding: 0.2rem 0.25rem 0.4rem;
+            }
+        }
+
+        @media (min-width: 1100px) {
+            .gallery-collection-grid {
+                grid-template-columns: repeat(3, minmax(0, 1fr));
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <a href="#main-content" class="skip-link">Skip to Main Content</a>
+
+    <header class="site-header">
+        <nav class="main-nav" aria-label="Main Navigation">
+            <div class="nav-container">
+                <a href="index.html" class="site-logo" aria-label="Museum of Lost Things Home">
+                    MUSEUM OF LOST THINGS
+                </a>
+
+                <ul class="nav-links">
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="sea.html">The Sea</a></li>
+                    <li><a href="gallery.html" aria-current="page">The Gallery</a></li>
+                </ul>
+            </div>
+        </nav>
+    </header>
+
+    <main id="main-content">
+
+        <section class="gallery-page-hero">
+            <div class="section-inner">
+                <div class="gallery-page-intro">
+                    <p class="section-label">The Museum</p>
+                    <h1>The Gallery</h1>
+                    <p class="gallery-page-description">
+                        A curated collection of lost objects, memories, words, and places — reorganized here as quiet
+                        archive records rather than ordinary cards.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <section class="gallery-filter-section">
+            <div class="section-inner">
+                <div class="gallery-filter-bar" aria-label="Gallery Categories">
+                    <button class="filter-chip active" type="button" aria-pressed="true" data-filter="all">All</button>
+                    <button class="filter-chip" type="button" aria-pressed="false"
+                        data-filter="objects">Objects</button>
+                    <button class="filter-chip" type="button" aria-pressed="false"
+                        data-filter="memories">Memories</button>
+                    <button class="filter-chip" type="button" aria-pressed="false" data-filter="words">Words</button>
+                    <button class="filter-chip" type="button" aria-pressed="false" data-filter="places">Places</button>
+                </div>
+            </div>
+        </section>
+
+        <section class="gallery-collection-section">
+            <div class="section-inner">
+                <div class="gallery-collection-grid">
+
+                    <article class="archive-card objects" data-category="objects">
+                        <button class="archive-card-button" type="button" data-record="Artifact No. 01"
+                            data-title="The password book from childhood" data-type="Object"
+                            data-origin="Childhood bedroom" data-status="Lost" data-image="images/password-book.png"
+                            data-alt="A small childhood password notebook">
+                            <span class="archive-stamp">Artifact No. 01 <span class="status-mark">LOST</span></span>
+                            <h2 class="archive-title">The password book from childhood</h2>
+                            <div class="archive-meta">
+                                <p><strong>Type:</strong> Object</p>
+                                <p><strong>Origin:</strong> Childhood bedroom</p>
+                                <p><strong>Status:</strong> Lost</p>
+                            </div>
+                            <p class="archive-condition"><strong>Condition:</strong> The code disappeared before the
+                                notebook itself.</p>
+                            <div class="archive-image-wrap">
+                                <img src="images/password-book.png" alt="A small childhood password notebook">
+                            </div>
+                            <p class="archive-prompt">Pull Drawer</p>
+                            <div class="archive-fulltext" hidden>
+                                Once, every page could be opened without hesitation. Now the code is gone, and what
+                                remains locked is not only the notebook itself, but the child who once knew exactly how
+                                to enter that small private world.
+                            </div>
+                        </button>
+                    </article>
+
+                    <article class="archive-card objects" data-category="objects">
+                        <button class="archive-card-button" type="button" data-record="Artifact No. 02"
+                            data-title="Margins in old textbooks" data-type="Object" data-origin="Student years"
+                            data-status="Sold off" data-image="images/old-textbooks.png"
+                            data-alt="A stack of old textbooks with handwritten notes">
+                            <span class="archive-stamp">Artifact No. 02 <span class="status-mark">FILED</span></span>
+                            <h2 class="archive-title">Margins in old textbooks</h2>
+                            <div class="archive-meta">
+                                <p><strong>Type:</strong> Object</p>
+                                <p><strong>Origin:</strong> Student years</p>
+                                <p><strong>Status:</strong> Sold off</p>
+                            </div>
+                            <p class="archive-condition"><strong>Condition:</strong> The printed content faded; the
+                                annotations did not.</p>
+                            <div class="archive-image-wrap">
+                                <img src="images/old-textbooks.png"
+                                    alt="A stack of old textbooks with handwritten notes">
+                            </div>
+                            <p class="archive-prompt">Pull Drawer</p>
+                            <div class="archive-fulltext" hidden>
+                                The books were sold after graduation because they took up too much space and no longer
+                                seemed useful. Yet what lingers is not the printed content, but the handwriting in the
+                                margins — the evidence of an earlier self thinking, underlining, and trying to
+                                understand.
+                            </div>
+                        </button>
+                    </article>
+
+                    <article class="archive-card objects" data-category="objects">
+                        <button class="archive-card-button" type="button" data-record="Artifact No. 03"
+                            data-title="The little raccoon plush" data-type="Object" data-origin="Childhood room"
+                            data-status="Passed on" data-image="images/raccoon-plush.png"
+                            data-alt="A childhood raccoon plush toy">
+                            <span class="archive-stamp">Artifact No. 03 <span class="status-mark">PASSED
+                                    ON</span></span>
+                            <h2 class="archive-title">The little raccoon plush</h2>
+                            <div class="archive-meta">
+                                <p><strong>Type:</strong> Object</p>
+                                <p><strong>Origin:</strong> Childhood room</p>
+                                <p><strong>Status:</strong> Passed on</p>
+                            </div>
+                            <p class="archive-condition"><strong>Condition:</strong> Still intact in memory.</p>
+                            <div class="archive-image-wrap">
+                                <img src="images/raccoon-plush.png" alt="A childhood raccoon plush toy">
+                            </div>
+                            <p class="archive-prompt">Pull Drawer</p>
+                            <div class="archive-fulltext" hidden>
+                                It was given away as I grew older, passed on so naturally that no one thought it
+                                mattered. But some objects do not leave quietly. Even now, I still miss the comfort and
+                                significance that small toy once carried for me.
+                            </div>
+                        </button>
+                    </article>
+
+                    <article class="archive-card words" data-category="words">
+                        <button class="archive-card-button" type="button" data-record="Record No. 04"
+                            data-title="His voice note" data-type="Word" data-origin="Middle school"
+                            data-status="Deleted" data-image="images/voice-message.png"
+                            data-alt="A lost voice message shown as a fading waveform">
+                            <span class="archive-stamp">Record No. 04 <span class="status-mark">DELETED</span></span>
+                            <h2 class="archive-title">His voice note</h2>
+                            <div class="archive-meta">
+                                <p><strong>Type:</strong> Word</p>
+                                <p><strong>Origin:</strong> Middle school</p>
+                                <p><strong>Status:</strong> Deleted</p>
+                            </div>
+                            <p class="archive-condition"><strong>Condition:</strong> The file vanished; the fact of once
+                                keeping it did not.</p>
+                            <div class="archive-image-wrap">
+                                <img src="images/voice-message.png"
+                                    alt="A lost voice message shown as a fading waveform">
+                            </div>
+                            <p class="archive-prompt">Pull Drawer</p>
+                            <div class="archive-fulltext" hidden>
+                                In middle school, I listened to it over and over, as if repetition itself could preserve
+                                a feeling. Then a new phone came, the storage was cleared, and the file disappeared. I
+                                do not know where he is now, but I still remember the fact of having once kept his
+                                voice.
+                            </div>
+                        </button>
+                    </article>
+
+                    <article class="archive-card words" data-category="words">
+                        <button class="archive-card-button" type="button" data-record="Record No. 05"
+                            data-title="The desire to share" data-type="Word" data-origin="Everyday life"
+                            data-status="Folded inward" data-image="images/sharing-impulse.png"
+                            data-alt="A fading social feed or blank posting screen">
+                            <span class="archive-stamp">Record No. 05 <span class="status-mark">FOLDED</span></span>
+                            <h2 class="archive-title">The desire to share</h2>
+                            <div class="archive-meta">
+                                <p><strong>Type:</strong> Word</p>
+                                <p><strong>Origin:</strong> Everyday life</p>
+                                <p><strong>Status:</strong> Folded inward</p>
+                            </div>
+                            <p class="archive-condition"><strong>Condition:</strong> Expression now arrives with
+                                hesitation.</p>
+                            <div class="archive-image-wrap">
+                                <img src="images/sharing-impulse.png"
+                                    alt="A fading social feed or blank posting screen">
+                            </div>
+                            <p class="archive-prompt">Pull Drawer</p>
+                            <div class="archive-fulltext" hidden>
+                                There was a time when everyday life felt easy to show — a meal, a trip, a passing mood,
+                                a small happiness. Now expression arrives together with hesitation, self-protection, and
+                                the fear of being misunderstood, until the impulse to share folds quietly back inward.
+                            </div>
+                        </button>
+                    </article>
+
+                    <article class="archive-card words" data-category="words">
+                        <button class="archive-card-button" type="button" data-record="Record No. 06"
+                            data-title="The ease of writing" data-type="Word" data-origin="Student years"
+                            data-status="Dimmed" data-image="images/writing-ability.png"
+                            data-alt="A fading page of handwriting">
+                            <span class="archive-stamp">Record No. 06 <span class="status-mark">DIMMED</span></span>
+                            <h2 class="archive-title">The ease of writing</h2>
+                            <div class="archive-meta">
+                                <p><strong>Type:</strong> Word</p>
+                                <p><strong>Origin:</strong> Student years</p>
+                                <p><strong>Status:</strong> Dimmed</p>
+                            </div>
+                            <p class="archive-condition"><strong>Condition:</strong> Language remains, but no longer
+                                arrives as easily.</p>
+                            <div class="archive-image-wrap">
+                                <img src="images/writing-ability.png" alt="A fading page of handwriting">
+                            </div>
+                            <p class="archive-prompt">Pull Drawer</p>
+                            <div class="archive-fulltext" hidden>
+                                In student years, words used to come with fluency, sharpened by reading and constant
+                                practice. Now, with less time spent writing and fewer books close at hand, expression
+                                feels heavier, slower, as if language still exists but no longer arrives with the same
+                                confidence.
+                            </div>
+                        </button>
+                    </article>
+
+                    <article class="archive-card places" data-category="places">
+                        <button class="archive-card-button" type="button" data-record="Site No. 07"
+                            data-title="My hometown after work" data-type="Place" data-origin="Hometown"
+                            data-status="Occasionally revisited" data-image="images/hometown.png"
+                            data-alt="A distant hometown street remembered in soft light">
+                            <span class="archive-stamp">Site No. 07 <span class="status-mark">DISTANT</span></span>
+                            <h2 class="archive-title">My hometown after work</h2>
+                            <div class="archive-meta">
+                                <p><strong>Type:</strong> Place</p>
+                                <p><strong>Origin:</strong> Hometown</p>
+                                <p><strong>Status:</strong> Occasionally revisited</p>
+                            </div>
+                            <p class="archive-condition"><strong>Condition:</strong> Distance made the ordinary more
+                                vivid.</p>
+                            <div class="archive-image-wrap">
+                                <img src="images/hometown.png" alt="A distant hometown street remembered in soft light">
+                            </div>
+                            <p class="archive-prompt">Pull Drawer</p>
+                            <div class="archive-fulltext" hidden>
+                                Work makes return feel occasional, almost ceremonial — once a year, sometimes less. Yet
+                                distance has only made the place more vivid in memory: the people, the rhythm of
+                                ordinary days, and all the small things that once felt too familiar to notice.
+                            </div>
+                        </button>
+                    </article>
+
+                    <article class="archive-card places" data-category="places">
+                        <button class="archive-card-button" type="button" data-record="Site No. 08"
+                            data-title="The old house before demolition" data-type="Place"
+                            data-origin="Old neighborhood" data-status="Demolished" data-image="images/old-house.png"
+                            data-alt="An old house remembered after demolition">
+                            <span class="archive-stamp">Site No. 08 <span class="status-mark">DEMOLISHED</span></span>
+                            <h2 class="archive-title">The old house before demolition</h2>
+                            <div class="archive-meta">
+                                <p><strong>Type:</strong> Place</p>
+                                <p><strong>Origin:</strong> Old neighborhood</p>
+                                <p><strong>Status:</strong> Demolished</p>
+                            </div>
+                            <p class="archive-condition"><strong>Condition:</strong> Survives now as a digital
+                                afterimage.</p>
+                            <div class="archive-image-wrap">
+                                <img src="images/old-house.png" alt="An old house remembered after demolition">
+                            </div>
+                            <p class="archive-prompt">Pull Drawer</p>
+                            <div class="archive-fulltext" hidden>
+                                The house itself is gone now, cleared away so completely that only absence remains on
+                                the ground. What is left is a strange afterimage: a building model on a map, a digital
+                                trace that still remembers the outline of a place no longer standing.
+                            </div>
+                        </button>
+                    </article>
+
+                    <article class="archive-card places" data-category="places">
+                        <button class="archive-card-button" type="button" data-record="Site No. 09"
+                            data-title="The city I no longer enter" data-type="Place" data-origin="A former life"
+                            data-status="Avoided" data-image="images/forbidden-city.png"
+                            data-alt="A familiar city remembered from afar">
+                            <span class="archive-stamp">Site No. 09 <span class="status-mark">AVOIDED</span></span>
+                            <h2 class="archive-title">The city I no longer enter</h2>
+                            <div class="archive-meta">
+                                <p><strong>Type:</strong> Place</p>
+                                <p><strong>Origin:</strong> A former life</p>
+                                <p><strong>Status:</strong> Avoided</p>
+                            </div>
+                            <p class="archive-condition"><strong>Condition:</strong> Not unknown — only too well known.
+                            </p>
+                            <div class="archive-image-wrap">
+                                <img src="images/forbidden-city.png" alt="A familiar city remembered from afar">
+                            </div>
+                            <p class="archive-prompt">Pull Drawer</p>
+
+
+                            <div class="archive-fulltext" hidden>
+                                After the breakup, I no longer dared to go back to her city. I told myself it was only
+                                another place on the map, but too much of her remained there. I was afraid of reopening
+                                what had never fully healed, afraid that every street and corner might stir up the
+                                sadness I had tried to put away. It is not distance that keeps me from returning, but
+                                the knot that still remains in my heart.
+                            </div>
+                        </button>
+                    </article>
+
+                    <article class="archive-card places" data-category="places">
+                        <button class="archive-card-button" type="button" data-record="Site No. 10"
+                            data-title="The name of my old school" data-type="Place" data-origin="High school"
+                            data-status="Renamed" data-image="images/high-school.png"
+                            data-alt="A school building with a changed name">
+                            <span class="archive-stamp">Site No. 10 <span class="status-mark">RENAMED</span></span>
+                            <h2 class="archive-title">The name of my old school</h2>
+                            <div class="archive-meta">
+                                <p><strong>Type:</strong> Place</p>
+                                <p><strong>Origin:</strong> High school</p>
+                                <p><strong>Status:</strong> Renamed</p>
+                            </div>
+                            <p class="archive-condition"><strong>Condition:</strong> The building remains; the sign does
+                                not.</p>
+                            <div class="archive-image-wrap">
+                                <img src="images/high-school.png" alt="A school building with a changed name">
+                            </div>
+                            <p class="archive-prompt">Pull Drawer</p>
+                            <div class="archive-fulltext" hidden>
+                                Later, schools were merged and the name of my high school was replaced by another. The
+                                buildings may still stand, but something essential was rewritten. It feels as though a
+                                part of my past was not erased exactly, but covered over by a new sign.
+                            </div>
+                        </button>
+                    </article>
+
+                    <article class="archive-card memories" data-category="memories">
+                        <button class="archive-card-button" type="button" data-record="Memory No. 11"
+                            data-title="The last time he called my name" data-type="Memory" data-origin="Family history"
+                            data-status="Unrecoverable" data-image="images/grandfather-memory.png"
+                            data-alt="A soft fading memory of a grandfather">
+                            <span class="archive-stamp">Memory No. 11 <span
+                                    class="status-mark">UNRECOVERED</span></span>
+                            <h2 class="archive-title">The last time he called my name</h2>
+                            <div class="archive-meta">
+                                <p><strong>Type:</strong> Memory</p>
+                                <p><strong>Origin:</strong> Family history</p>
+                                <p><strong>Status:</strong> Unrecoverable</p>
+                            </div>
+                            <p class="archive-condition"><strong>Condition:</strong> What remains is grief shaped by
+                                absence.</p>
+                            <div class="archive-image-wrap">
+                                <img src="images/grandfather-memory.png" alt="A soft fading memory of a grandfather">
+                            </div>
+                            <p class="archive-prompt">Pull Drawer</p>
+                            <div class="archive-fulltext" hidden>
+                                I was raised by my grandparents, and my grandfather kept asking for me near the end. I
+                                was not there to hear his final call. What remains now is not only grief, but the
+                                unbearable knowledge of a moment that continued without me.
+                            </div>
+                        </button>
+                    </article>
+
+                    <article class="archive-card memories" data-category="memories">
+                        <button class="archive-card-button" type="button" data-record="Memory No. 12"
+                            data-title="The feeling of joy" data-type="Memory" data-origin="Earlier self"
+                            data-status="Loosened" data-image="images/lost-joy.png"
+                            data-alt="A quiet landscape with faded brightness">
+                            <span class="archive-stamp">Memory No. 12 <span class="status-mark">DIMMED</span></span>
+                            <h2 class="archive-title">The feeling of joy</h2>
+                            <div class="archive-meta">
+                                <p><strong>Type:</strong> Memory</p>
+                                <p><strong>Origin:</strong> Earlier self</p>
+                                <p><strong>Status:</strong> Loosened</p>
+                            </div>
+                            <p class="archive-condition"><strong>Condition:</strong> Delight faded without ever
+                                announcing its leaving.</p>
+                            <div class="archive-image-wrap">
+                                <img src="images/lost-joy.png" alt="A quiet landscape with faded brightness">
+                            </div>
+                            <p class="archive-prompt">Pull Drawer</p>
+                            <div class="archive-fulltext" hidden>
+                                There was a time when travel, beauty, and good things arrived with a clear spark of
+                                happiness. Now even what should feel exciting sometimes reaches me already dimmed, as if
+                                delight has quietly loosened its hold without ever announcing that it was leaving.
+                            </div>
+                        </button>
+                    </article>
+
+                    <article class="archive-card memories" data-category="memories">
+                        <button class="archive-card-button" type="button" data-record="Memory No. 13"
+                            data-title="The courage to confess" data-type="Memory" data-origin="Younger self"
+                            data-status="Less reachable" data-image="images/lost-courage.png"
+                            data-alt="A dim light suggesting fading courage">
+                            <span class="archive-stamp">Memory No. 13 <span class="status-mark">FADED</span></span>
+                            <h2 class="archive-title">The courage to confess</h2>
+                            <div class="archive-meta">
+                                <p><strong>Type:</strong> Memory</p>
+                                <p><strong>Origin:</strong> Younger self</p>
+                                <p><strong>Status:</strong> Less reachable</p>
+                            </div>
+                            <p class="archive-condition"><strong>Condition:</strong> Brave sincerity now feels heavier
+                                to hold.</p>
+                            <div class="archive-image-wrap">
+                                <img src="images/lost-courage.png" alt="A dim light suggesting fading courage">
+                            </div>
+                            <p class="archive-prompt">Pull Drawer</p>
+                            <div class="archive-fulltext" hidden>
+                                It is not only a missed confession that remains in memory, but the larger feeling that I
+                                no longer possess that same kind of brave sincerity. Life grows heavier, everyone
+                                carries their own burdens, and certain forms of courage begin to feel less reachable
+                                than before.
+                            </div>
+                        </button>
+                    </article>
+
+                    <article class="archive-card memories" data-category="memories">
+                        <button class="archive-card-button" type="button" data-record="Memory No. 14"
+                            data-title="The years at fifteen and sixteen" data-type="Memory" data-origin="Adolescence"
+                            data-status="Fragmented" data-image="images/blurred-youth.png"
+                            data-alt="A blurred memory of teenage years">
+                            <span class="archive-stamp">Memory No. 14 <span class="status-mark">FRAGMENT</span></span>
+                            <h2 class="archive-title">The years at fifteen and sixteen</h2>
+                            <div class="archive-meta">
+                                <p><strong>Type:</strong> Memory</p>
+                                <p><strong>Origin:</strong> Adolescence</p>
+                                <p><strong>Status:</strong> Fragmented</p>
+                            </div>
+                            <p class="archive-condition"><strong>Condition:</strong> Only weather, fragments, and
+                                outlines remain.</p>
+                            <div class="archive-image-wrap">
+                                <img src="images/blurred-youth.png" alt="A blurred memory of teenage years">
+                            </div>
+                            <p class="archive-prompt">Pull Drawer</p>
+                            <div class="archive-fulltext" hidden>
+                                I once believed that the years of adolescence would remain forever vivid, simply because
+                                I was old enough to know I was living them. But memory has blurred even those days,
+                                leaving behind only fragments, weather, and the outline of a self I can no longer fully
+                                recover.
+                            </div>
+                        </button>
+                    </article>
+
+                    <article class="archive-card memories" data-category="memories">
+                        <button class="archive-card-button" type="button" data-record="Memory No. 15"
+                            data-title="A sense of time" data-type="Memory" data-origin="Daily life"
+                            data-status="Distorted" data-image="images/time-sense.png"
+                            data-alt="A clock blurred by scrolling light">
+                            <span class="archive-stamp">Memory No. 15 <span class="status-mark">SLIPPED</span></span>
+                            <h2 class="archive-title">A sense of time</h2>
+                            <div class="archive-meta">
+                                <p><strong>Type:</strong> Memory</p>
+                                <p><strong>Origin:</strong> Daily life</p>
+                                <p><strong>Status:</strong> Distorted</p>
+                            </div>
+                            <p class="archive-condition"><strong>Condition:</strong> Time slips before it is properly
+                                felt.</p>
+                            <div class="archive-image-wrap">
+                                <img src="images/time-sense.png" alt="A clock blurred by scrolling light">
+                            </div>
+                            <p class="archive-prompt">Pull Drawer</p>
+                            <div class="archive-fulltext" hidden>
+                                What feels like ten minutes can quietly become an hour, dissolved into scrolling and
+                                small distractions. The loss is subtle but constant: not time itself, exactly, but the
+                                ability to feel its passing with any accuracy while it is still happening.
+                            </div>
+                        </button>
+                    </article>
+
+                    <article class="archive-card memories" data-category="memories">
+                        <button class="archive-card-button" type="button" data-record="Memory No. 16"
+                            data-title="Clear distance" data-type="Memory" data-origin="Before nearsightedness"
+                            data-status="Blurred" data-image="images/clear-distance.png"
+                            data-alt="A world seen clearly before blur">
+                            <span class="archive-stamp">Memory No. 16 <span class="status-mark">BLURRED</span></span>
+                            <h2 class="archive-title">Clear distance</h2>
+                            <div class="archive-meta">
+                                <p><strong>Type:</strong> Memory</p>
+                                <p><strong>Origin:</strong> Before nearsightedness</p>
+                                <p><strong>Status:</strong> Blurred</p>
+                            </div>
+                            <p class="archive-condition"><strong>Condition:</strong> A former trust in immediacy no
+                                longer holds.</p>
+                            <div class="archive-image-wrap">
+                                <img src="images/clear-distance.png" alt="A world seen clearly before blur">
+                            </div>
+                            <p class="archive-prompt">Pull Drawer</p>
+                            <div class="archive-fulltext" hidden>
+                                I miss the earlier world before nearsightedness, when books, streets, and faces arrived
+                                sharply and without effort. What is gone is not only vision, but a certain trust in
+                                immediacy — the ease of looking outward and receiving the world clearly.
+                            </div>
+                        </button>
+                    </article>
+
+                </div>
+
+                <p class="archive-empty" id="archive-empty-state">Nothing surfaced from the sea.</p>
+            </div>
+        </section>
+
+        <section class="gallery-back-section">
+            <div class="section-inner">
+                <div class="gallery-back-link">
+                    <a href="index.html" class="secondary-button">Back to Home</a>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <div class="archive-modal" id="archive-modal" hidden>
+        <div class="archive-modal-backdrop" data-close="true"></div>
+        <div class="archive-modal-dialog" role="dialog" aria-modal="true" aria-labelledby="archive-modal-title">
+            <button class="archive-modal-close" id="archive-modal-close" type="button"
+                aria-label="Close archive record">×</button>
+
+            <div class="archive-modal-content">
+                <div class="archive-modal-visual">
+                    <figure class="archive-modal-figure">
+                        <img id="archive-modal-image" src="" alt="">
+                    </figure>
+                    <p class="archive-modal-caption" id="archive-modal-caption">
+                        Recovered from memory, not from place.
+                    </p>
+                </div>
+
+                <div class="archive-modal-copy">
+                    <p class="archive-modal-label">Recovered Record</p>
+                    <h2 class="archive-modal-title" id="archive-modal-title">Untitled</h2>
+                    <p class="archive-modal-record" id="archive-modal-record">Artifact No. 00</p>
+
+                    <div class="archive-modal-grid">
+                        <p><strong>Type:</strong> <span id="archive-modal-type">Object</span></p>
+                        <p><strong>Origin:</strong> <span id="archive-modal-origin">Unknown</span></p>
+                        <p><strong>Status:</strong> <span id="archive-modal-status">Lost</span></p>
+                        <p><strong>Condition:</strong> <span id="archive-modal-condition">Filed for remembrance.</span>
+                        </p>
+                    </div>
+
+                    <p class="archive-modal-subhead">Curatorial Note</p>
+                    <p class="archive-modal-note" id="archive-modal-note"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<footer class="site-footer tide-footer">
+    <div class="footer-inner tide-footer-inner">
+        <p class="footer-copy">
+            &copy; <span id="footer-year"></span> Museum of Lost Things
+        </p>
+    </div>
+</footer>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const footerYear = document.getElementById('footer-year');
+    if (footerYear) {
+        footerYear.textContent = new Date().getFullYear();
+    }
+});
+</script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const chips = document.querySelectorAll('.filter-chip');
+            const cards = document.querySelectorAll('.archive-card');
+            const emptyState = document.getElementById('archive-empty-state');
+
+            const modal = document.getElementById('archive-modal');
+            const modalClose = document.getElementById('archive-modal-close');
+            const modalTitle = document.getElementById('archive-modal-title');
+            const modalRecord = document.getElementById('archive-modal-record');
+            const modalType = document.getElementById('archive-modal-type');
+            const modalOrigin = document.getElementById('archive-modal-origin');
+            const modalStatus = document.getElementById('archive-modal-status');
+            const modalCondition = document.getElementById('archive-modal-condition');
+            const modalImage = document.getElementById('archive-modal-image');
+            const modalNote = document.getElementById('archive-modal-note');
+            const modalCaption = document.getElementById('archive-modal-caption');
+
+            let lastFocusedElement = null;
+
+            function updateEmptyState() {
+                const visibleCards = Array.from(cards).filter(card => !card.hidden);
+                emptyState.classList.toggle('show', visibleCards.length === 0);
+            }
+
+            chips.forEach(chip => {
+                chip.addEventListener('click', function () {
+                    const filter = chip.dataset.filter;
+
+                    chips.forEach(btn => {
+                        btn.classList.remove('active');
+                        btn.setAttribute('aria-pressed', 'false');
+                    });
+
+                    chip.classList.add('active');
+                    chip.setAttribute('aria-pressed', 'true');
+
+                    cards.forEach(card => {
+                        const matches = filter === 'all' || card.dataset.category === filter;
+                        card.hidden = !matches;
+                    });
+
+                    updateEmptyState();
+                });
+            });
+
+            function openModal(button) {
+                lastFocusedElement = document.activeElement;
+
+                modalTitle.textContent = button.dataset.title;
+                modalRecord.textContent = button.dataset.record;
+                modalType.textContent = button.dataset.type;
+                modalOrigin.textContent = button.dataset.origin;
+                modalStatus.textContent = button.dataset.status;
+                modalCondition.textContent = button.dataset.condition;
+                modalImage.src = button.dataset.image;
+                modalImage.alt = button.dataset.alt;
+                modalNote.textContent = button.querySelector('.archive-fulltext').textContent.trim();
+                modalCaption.textContent = button.dataset.condition;
+
+                modal.hidden = false;
+                document.body.style.overflow = 'hidden';
+                modalClose.focus();
+            }
+
+            function closeModal() {
+                modal.hidden = true;
+                document.body.style.overflow = '';
+                if (lastFocusedElement) {
+                    lastFocusedElement.focus();
+                }
+            }
+
+            document.querySelectorAll('.archive-card-button').forEach(button => {
+                button.addEventListener('click', function () {
+                    openModal(button);
+                });
+            });
+
+            modalClose.addEventListener('click', closeModal);
+
+            modal.addEventListener('click', function (event) {
+                if (event.target.dataset.close === 'true') {
+                    closeModal();
+                }
+            });
+
+            document.addEventListener('keydown', function (event) {
+                if (event.key === 'Escape' && !modal.hidden) {
+                    closeModal();
+                }
+            });
+
+            updateEmptyState();
+        });
+    </script>
+
+</body>
+
+</html>
